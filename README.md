@@ -12,11 +12,11 @@ and live module permissions shared by both interfaces.
 
 ### OmniBridge tab
 
-![OmniBridge tab in Burp Suite](docs/images/omniapi-burp-tab.png)
+![OmniBridge tab in Burp Suite](docs/images/omnibridge-burp-tab.png)
 
 ### Swagger UI
 
-![OmniBridge Swagger UI](docs/images/omniapi-swagger-ui.png)
+![OmniBridge Swagger UI](docs/images/omnibridge-swagger-ui.png)
 
 ## Build and install
 
@@ -37,7 +37,7 @@ provides it at runtime.
 
 Every push to `main` runs the complete test and fat-JAR verification suite. The workflow uploads
 the JAR as a retained Actions artifact and publishes a new immutable
-[versioned release](https://github.com/xhzeem/burp-omniapi/releases/latest). Release tags use
+[versioned release](https://github.com/xhzeem/burp-omnibridge/releases/latest). Release tags use
 `v<project-version>-build.<run-number>`, and every release contains exactly one asset:
 `burp-omnibridge.jar`.
 

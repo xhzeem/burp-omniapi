@@ -1,1 +1,1 @@
-rootProject.name = "burp-omniapi"
+rootProject.name = "burp-omnibridge"

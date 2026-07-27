@@ -9,7 +9,7 @@ plugins {
     id("com.gradleup.shadow") version "9.2.2"
 }
 
-group = "dev.omniapi"
+group = "dev.omnibridge"
 version = "0.2.0"
 
 repositories { mavenCentral() }
@@ -86,8 +86,8 @@ val verifyShadowJar by tasks.registering {
         ZipFile(artifact.get().asFile).use { jar ->
             val entries = jar.entries().asSequence().map { it.name }.toSet()
             val requiredEntries = setOf(
-                "dev/omniapi/OmniApiExtension.class",
-                "dev/omniapi/mcp/McpHandler.class",
+                "dev/omnibridge/OmniBridgeExtension.class",
+                "dev/omnibridge/mcp/McpHandler.class",
                 "io/javalin/Javalin.class",
                 "org/eclipse/jetty/server/Server.class",
                 "com/fasterxml/jackson/databind/ObjectMapper.class",

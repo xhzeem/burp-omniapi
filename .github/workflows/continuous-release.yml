@@ -37,17 +37,11 @@ jobs:
       - name: Test and build the verified Shadow JAR
         run: ./gradlew clean build verifyShadowJar --no-daemon
 
-      - name: Write SHA-256 checksum
-        working-directory: output
-        run: sha256sum burp-omniapi.jar > burp-omniapi.jar.sha256
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: burp-omniapi-${{ github.sha }}
-          path: |
-            output/burp-omniapi.jar
-            output/burp-omniapi.jar.sha256
+          path: output/burp-omniapi.jar
+          archive: false
           if-no-files-found: error
           retention-days: 30
 
@@ -77,5 +71,4 @@ jobs:
 
           gh release upload "${release_tag}" \
             output/burp-omniapi.jar \
-            output/burp-omniapi.jar.sha256 \
             --clobber

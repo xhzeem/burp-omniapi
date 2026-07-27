@@ -7,6 +7,16 @@ an authenticated REST API.
 The extension starts asynchronously at `http://127.0.0.1:31337`. Its Burp tab is named **OmniAPI**.
 The tab controls the bind address, port, API key, server lifecycle, and live module permissions.
 
+## Screenshots
+
+### OmniAPI tab
+
+![OmniAPI tab in Burp Suite](docs/images/omniapi-burp-tab.png)
+
+### Swagger UI
+
+![OmniAPI Swagger UI](docs/images/omniapi-swagger-ui.png)
+
 ## Build and install
 
 Requirements:
@@ -27,7 +37,7 @@ provides it at runtime.
 Every push to `main` runs the complete test and fat-JAR verification suite. The workflow uploads
 the JAR as a retained Actions artifact and refreshes the
 [continuous prerelease](https://github.com/xhzeem/burp-omniapi/releases/tag/continuous) with
-`burp-omniapi.jar` and its SHA-256 checksum.
+exactly one release asset: `burp-omniapi.jar`.
 
 Open the **OmniAPI** tab to copy the generated `X-API-Key`. A new 256-bit key is created on each
 extension load. Protected endpoints accept the key either in the recommended `X-API-Key` header or

@@ -119,3 +119,7 @@ The implementation-to-review mapping for PortSwigger's current requirements is d
 [BAPP_ACCEPTANCE.md](BAPP_ACCEPTANCE.md). Run `./gradlew verifyShadowJar` to verify that the
 submission artifact contains Javalin, Jetty, Jackson, generated OpenAPI metadata, and locally hosted
 Swagger assets while excluding the Burp-provided Montoya API classes.
+
+## License
+
+Burp OmniAPI is released under the [MIT License](LICENSE).

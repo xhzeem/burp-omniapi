@@ -22,7 +22,7 @@ class HttpHandler(private val api: MontoyaApi, private val gate: OperationGate) 
     private val cookieLock = ReentrantLock()
 
     @OpenApi(
-        path = "/http/send",
+        path = "/api/v1/http/send",
         methods = [HttpMethod.POST],
         summary = "Send an HTTP request",
         tags = ["HTTP"],
@@ -45,7 +45,7 @@ class HttpHandler(private val api: MontoyaApi, private val gate: OperationGate) 
     }
 
     @OpenApi(
-        path = "/http/cookies",
+        path = "/api/v1/http/cookies",
         methods = [HttpMethod.GET],
         summary = "Read Burp's cookie jar",
         tags = ["HTTP"],
@@ -60,7 +60,7 @@ class HttpHandler(private val api: MontoyaApi, private val gate: OperationGate) 
     }
 
     @OpenApi(
-        path = "/http/cookies",
+        path = "/api/v1/http/cookies",
         methods = [HttpMethod.PUT],
         summary = "Set a cookie in Burp's cookie jar",
         tags = ["HTTP"],

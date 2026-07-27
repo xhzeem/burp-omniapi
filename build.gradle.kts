@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "dev.omniapi"
-version = "0.1.0"
+version = "0.2.0"
 
 repositories { mavenCentral() }
 
@@ -52,13 +52,13 @@ java {
 tasks.test { useJUnitPlatform() }
 
 tasks.withType<ShadowJar>().configureEach {
-    archiveFileName.set("burp-omniapi.jar")
+    archiveFileName.set("burp-omnibridge.jar")
     destinationDirectory.set(layout.projectDirectory.dir("output"))
     mergeServiceFiles()
     exclude("burp/api/montoya/**")
     manifest {
         attributes(
-            "Implementation-Title" to "Burp OmniAPI",
+            "Implementation-Title" to "Burp OmniBridge",
             "Implementation-Version" to project.version
         )
     }
@@ -87,6 +87,7 @@ val verifyShadowJar by tasks.registering {
             val entries = jar.entries().asSequence().map { it.name }.toSet()
             val requiredEntries = setOf(
                 "dev/omniapi/OmniApiExtension.class",
+                "dev/omniapi/mcp/McpHandler.class",
                 "io/javalin/Javalin.class",
                 "org/eclipse/jetty/server/Server.class",
                 "com/fasterxml/jackson/databind/ObjectMapper.class",

@@ -19,7 +19,7 @@ class TargetHandler(private val api: MontoyaApi, private val gate: OperationGate
     private val scopeLock = ReentrantLock()
 
     @OpenApi(
-        path = "/target/sitemap",
+        path = "/api/v1/target/sitemap",
         methods = [HttpMethod.GET],
         summary = "Read the site map",
         tags = ["Target"],
@@ -49,7 +49,7 @@ class TargetHandler(private val api: MontoyaApi, private val gate: OperationGate
     }
 
     @OpenApi(
-        path = "/target/scope",
+        path = "/api/v1/target/scope",
         methods = [HttpMethod.POST],
         summary = "Update suite scope",
         tags = ["Target"],

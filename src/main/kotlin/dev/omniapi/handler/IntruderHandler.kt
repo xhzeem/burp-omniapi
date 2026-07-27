@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities
 
 class IntruderHandler(private val api: MontoyaApi) {
     @OpenApi(
-        path = "/intruder/attack",
+        path = "/api/v1/intruder/attack",
         methods = [HttpMethod.POST],
         summary = "Open an Intruder request template",
         tags = ["Intruder"],

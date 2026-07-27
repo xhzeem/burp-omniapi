@@ -31,7 +31,7 @@ class ScannerHandler(private val api: MontoyaApi, private val gate: OperationGat
     private val tasks = ConcurrentHashMap<String, ManagedTask>()
 
     @OpenApi(
-        path = "/scanner/scan",
+        path = "/api/v1/scanner/scan",
         methods = [HttpMethod.POST],
         summary = "Start a crawl or active audit",
         tags = ["Scanner"],
@@ -45,7 +45,7 @@ class ScannerHandler(private val api: MontoyaApi, private val gate: OperationGat
     )
     fun scan(ctx: Context) = gate.run {
         if (tasks.size >= MAX_TASKS) {
-            throw dev.omniapi.server.TooBusy("The scanner task registry is full; restart OmniAPI to clear it")
+            throw dev.omniapi.server.TooBusy("The scanner task registry is full; restart OmniBridge to clear it")
         }
         val input = ctx.bodyValidated<ScanRequest>()
         if (input.urls.isEmpty() || input.urls.size > 100) {
@@ -74,11 +74,11 @@ class ScannerHandler(private val api: MontoyaApi, private val gate: OperationGat
     }
 
     @OpenApi(
-        path = "/scanner/tasks/{id}",
+        path = "/api/v1/scanner/tasks/{id}",
         methods = [HttpMethod.GET],
         summary = "Read scan task status",
         tags = ["Scanner"],
-        pathParams = [OpenApiParam(name = "id", type = String::class, description = "OmniAPI scan task ID", required = true)],
+        pathParams = [OpenApiParam(name = "id", type = String::class, description = "OmniBridge scan task ID", required = true)],
         responses = [
             OpenApiResponse(status = "200", content = [OpenApiContent(from = ScanTaskDto::class)]),
             OpenApiResponse(status = "404", content = [OpenApiContent(from = dev.omniapi.model.ErrorResponse::class)])
@@ -101,7 +101,7 @@ class ScannerHandler(private val api: MontoyaApi, private val gate: OperationGat
     }
 
     @OpenApi(
-        path = "/scanner/issues",
+        path = "/api/v1/scanner/issues",
         methods = [HttpMethod.GET],
         summary = "Read Scanner issues",
         tags = ["Scanner"],

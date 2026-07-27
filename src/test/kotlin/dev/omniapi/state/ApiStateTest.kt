@@ -13,6 +13,9 @@ class ApiStateTest {
         val state = ApiState()
         assertEquals(31337, state.port.get())
         assertEquals("127.0.0.1", state.bindAddress.get())
+        assertTrue(state.restEnabled.get())
+        assertTrue(state.mcpEnabled.get())
+        assertFalse(state.configEditingEnabled.get())
         assertEquals(32, Base64.getUrlDecoder().decode(state.apiKey()).size)
         assertTrue(ApiModule.entries.all(state::isEnabled))
     }

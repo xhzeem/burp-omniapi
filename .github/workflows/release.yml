@@ -50,7 +50,7 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: output/burp-omniapi.jar
+          path: output/burp-omnibridge.jar
           archive: false
           if-no-files-found: error
           retention-days: 30
@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           release_tag="${{ steps.release.outputs.tag }}"
-          release_title="Burp OmniAPI ${{ steps.release.outputs.version }}"
+          release_title="Burp OmniBridge ${{ steps.release.outputs.version }}"
           release_notes="Automated verified build from commit ${GITHUB_SHA} on the main branch."
 
           if gh release view "${release_tag}" >/dev/null 2>&1; then
@@ -79,5 +79,5 @@ jobs:
           fi
 
           gh release upload "${release_tag}" \
-            output/burp-omniapi.jar \
+            output/burp-omnibridge.jar \
             --clobber

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.omniapi.handler.BambdaHandler
 import dev.omniapi.handler.CollaboratorHandler
+import dev.omniapi.handler.ConfigurationHandler
 import dev.omniapi.handler.HttpHandler
 import dev.omniapi.handler.IntruderHandler
 import dev.omniapi.handler.ProxyHandler
@@ -17,6 +18,7 @@ import dev.omniapi.handler.TargetHandler
 import dev.omniapi.handler.ToolsHandler
 import dev.omniapi.handler.UtilitiesHandler
 import dev.omniapi.handler.WebSocketHandler
+import dev.omniapi.mcp.McpHandler
 import dev.omniapi.model.ErrorResponse
 import dev.omniapi.state.ApiModule
 import dev.omniapi.state.ApiState
@@ -25,6 +27,7 @@ import io.javalin.apibuilder.ApiBuilder.delete
 import io.javalin.apibuilder.ApiBuilder.get
 import io.javalin.apibuilder.ApiBuilder.post
 import io.javalin.apibuilder.ApiBuilder.put
+import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.http.BadRequestResponse
 import io.javalin.http.HttpResponseException
 import io.javalin.json.JavalinJackson
@@ -51,6 +54,7 @@ class ApiServer(
         val repeater = RepeaterHandler(api)
         val intruder = IntruderHandler(api)
         val collaborator = CollaboratorHandler(collaboratorClient, gate)
+        val configuration = ConfigurationHandler(api)
         val http = HttpHandler(api, gate)
         val tools = ToolsHandler(api, gate)
         val bambda = BambdaHandler(api)
@@ -60,16 +64,61 @@ class ApiServer(
             .addModule(KotlinModule.Builder().build())
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build()
+        val mcp = McpHandler(api, state, mapper)
+
+        fun registerRestRoutes() {
+            get("/system/info", system::info)
+            get("/system/capabilities", system::capabilities)
+
+            get("/proxy/history", proxy::history)
+            post("/proxy/intercept", proxy::intercept)
+
+            get("/target/sitemap", target::sitemap)
+            post("/target/scope", target::scope)
+
+            post("/repeater/send", repeater::send)
+
+            post("/scanner/scan", scanner::scan)
+            get("/scanner/tasks/{id}", scanner::task)
+            get("/scanner/issues", scanner::issues)
+
+            post("/intruder/attack", intruder::attack)
+
+            post("/collaborator/payload", collaborator::payload)
+            get("/collaborator/interactions", collaborator::interactions)
+
+            get("/config/project", configuration::project)
+            put("/config/project", configuration::setProject)
+            get("/config/user", configuration::user)
+            put("/config/user", configuration::setUser)
+
+            post("/http/send", http::send)
+            get("/http/cookies", http::cookies)
+            put("/http/cookies", http::setCookie)
+
+            post("/websockets", webSockets::connect)
+            post("/websockets/{id}/messages", webSockets::send)
+            get("/websockets/{id}/events", webSockets::events)
+            delete("/websockets/{id}", webSockets::close)
+
+            post("/tools/decoder", tools::decoder)
+            post("/tools/comparer", tools::comparer)
+            post("/tools/organizer", tools::organizer)
+            get("/tools/organizer", tools::organizerItems)
+
+            post("/bambda/import", bambda::importBambda)
+            post("/utilities/transform", utilities::transform)
+        }
 
         val created = Javalin.create { config ->
             config.showJavalinBanner = false
             config.http.maxRequestSize = MAX_REQUEST_SIZE
             config.jsonMapper(JavalinJackson(mapper))
             config.registerPlugin(OpenApiPlugin { plugin ->
-                plugin.withDocumentationPath("/openapi")
+                plugin.withDocumentationPath("$REST_PREFIX/openapi")
                     .withDefinitionConfiguration { _, definition ->
                         definition.withInfo { info: OpenApiInfo ->
-                            info.title = "Burp OmniAPI"
+                            info.title = "Burp OmniBridge REST API"
                             info.version = SystemHandler.VERSION
                             info.description = "Authenticated workflow API for Burp Suite's public Montoya capabilities"
                         }
@@ -82,47 +131,15 @@ class ApiServer(
                     }
             })
             config.registerPlugin(SwaggerPlugin { swagger ->
-                swagger.documentationPath = "/openapi"
-                swagger.uiPath = "/swagger"
+                swagger.documentationPath = "$REST_PREFIX/openapi"
+                swagger.uiPath = "$REST_PREFIX/swagger"
             })
             config.router.apiBuilder {
                 get("/health", system::health)
-                get("/system/info", system::info)
-                get("/system/capabilities", system::capabilities)
-
-                get("/proxy/history", proxy::history)
-                post("/proxy/intercept", proxy::intercept)
-
-                get("/target/sitemap", target::sitemap)
-                post("/target/scope", target::scope)
-
-                post("/repeater/send", repeater::send)
-
-                post("/scanner/scan", scanner::scan)
-                get("/scanner/tasks/{id}", scanner::task)
-                get("/scanner/issues", scanner::issues)
-
-                post("/intruder/attack", intruder::attack)
-
-                post("/collaborator/payload", collaborator::payload)
-                get("/collaborator/interactions", collaborator::interactions)
-
-                post("/http/send", http::send)
-                get("/http/cookies", http::cookies)
-                put("/http/cookies", http::setCookie)
-
-                post("/websockets", webSockets::connect)
-                post("/websockets/{id}/messages", webSockets::send)
-                get("/websockets/{id}/events", webSockets::events)
-                delete("/websockets/{id}", webSockets::close)
-
-                post("/tools/decoder", tools::decoder)
-                post("/tools/comparer", tools::comparer)
-                post("/tools/organizer", tools::organizer)
-                get("/tools/organizer", tools::organizerItems)
-
-                post("/bambda/import", bambda::importBambda)
-                post("/utilities/transform", utilities::transform)
+                path(REST_PREFIX) { registerRestRoutes() }
+                // Compatibility aliases for the 0.x OmniBridge routes.
+                registerRestRoutes()
+                post("/mcp", mcp::handle)
             }
         }
 
@@ -130,6 +147,16 @@ class ApiServer(
             val requestId = UUID.randomUUID().toString()
             ctx.attribute(REQUEST_ID, requestId)
             ctx.header("X-Request-ID", requestId)
+            when {
+                ctx.path() == "/mcp" && !state.mcpEnabled.get() -> {
+                    ctx.status(404)
+                    ctx.skipRemainingHandlers()
+                }
+                isRestPath(ctx.path()) && !state.restEnabled.get() -> {
+                    ctx.status(404)
+                    ctx.skipRemainingHandlers()
+                }
+            }
         }
         created.beforeMatched { ctx ->
             if (isPublic(ctx.path())) return@beforeMatched
@@ -146,11 +173,27 @@ class ApiServer(
                 ctx.skipRemainingHandlers()
                 return@beforeMatched
             }
-            ApiModule.forPath(ctx.path())?.let { module ->
+            val operationalPath = ctx.path().removePrefix(REST_PREFIX)
+            if (operationalPath.startsWith("/config/") && !state.configEditingEnabled.get()) {
+                ctx.status(403).json(
+                    error(
+                        ctx,
+                        "CONFIG_EDITING_DISABLED",
+                        "Configuration editing is disabled in the OmniBridge tab"
+                    )
+                )
+                ctx.skipRemainingHandlers()
+                return@beforeMatched
+            }
+            ApiModule.forPath(operationalPath)?.let { module ->
                 if (!state.isEnabled(module)) {
-                    ctx.status(403).json(error(ctx, "MODULE_DISABLED", "${module.name} is disabled in the OmniAPI tab"))
+                    ctx.status(403).json(error(ctx, "MODULE_DISABLED", "${module.name} is disabled in the OmniBridge tab"))
                     ctx.skipRemainingHandlers()
                 }
+            }
+            if (!ctx.path().startsWith(REST_PREFIX) && ctx.path() != "/mcp") {
+                ctx.header("Deprecation", "true")
+                ctx.header("Link", "<$REST_PREFIX${ctx.path()}>; rel=\"successor-version\"")
             }
         }
         created.exception(CapabilityUnavailable::class.java) { exception, ctx ->
@@ -169,11 +212,11 @@ class ApiServer(
             ctx.status(exception.status).json(error(ctx, "HTTP_${exception.status}", exception.message ?: "Request failed"))
         }
         created.exception(Exception::class.java) { exception, ctx ->
-            api.logging().logToError("OmniAPI request ${ctx.attribute<String>(REQUEST_ID)} failed", exception)
+            api.logging().logToError("OmniBridge request ${ctx.attribute<String>(REQUEST_ID)} failed", exception)
             ctx.status(500).json(error(ctx, "INTERNAL_ERROR", "The request failed; see Burp's extension log"))
         }
         created.error(404) { ctx ->
-            ctx.json(error(ctx, "NOT_FOUND", "No OmniAPI endpoint matches this request"))
+            ctx.json(error(ctx, "NOT_FOUND", "No OmniBridge endpoint matches this request"))
         }
 
         try {
@@ -196,11 +239,15 @@ class ApiServer(
 
     private fun isPublic(path: String): Boolean =
         path == "/health" ||
-            path == "/openapi" ||
-            path.startsWith("/openapi/") ||
-            path == "/swagger" ||
-            path.startsWith("/swagger/") ||
+            path == "$REST_PREFIX/openapi" ||
+            path.startsWith("$REST_PREFIX/openapi/") ||
+            path == "$REST_PREFIX/swagger" ||
+            path.startsWith("$REST_PREFIX/swagger/") ||
             path.startsWith("/webjars/swagger-ui/")
+
+    private fun isRestPath(path: String): Boolean =
+        path.startsWith(REST_PREFIX) ||
+            (path != "/health" && path != "/mcp" && !path.startsWith("/webjars/swagger-ui/"))
 
     private fun error(ctx: io.javalin.http.Context, code: String, message: String) =
         ErrorResponse(code, message, ctx.attribute(REQUEST_ID))
@@ -210,5 +257,6 @@ class ApiServer(
         private const val API_KEY_HEADER = "X-API-Key"
         private const val API_KEY_QUERY_PARAMETER = "apiKey"
         private const val MAX_REQUEST_SIZE = 16L * 1024 * 1024
+        const val REST_PREFIX = "/api/v1"
     }
 }

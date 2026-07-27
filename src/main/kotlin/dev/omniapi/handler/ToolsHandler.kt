@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities
 
 class ToolsHandler(private val api: MontoyaApi, private val gate: OperationGate) {
     @OpenApi(
-        path = "/tools/decoder", methods = [HttpMethod.POST], summary = "Send bytes to Decoder", tags = ["Tools"],
+        path = "/api/v1/tools/decoder", methods = [HttpMethod.POST], summary = "Send bytes to Decoder", tags = ["Tools"],
         requestBody = OpenApiRequestBody(content = [OpenApiContent(from = ToolSendRequest::class)]),
         responses = [OpenApiResponse(status = "202", content = [OpenApiContent(from = StatusResponse::class)])],
         security = [OpenApiSecurity(name = "ApiKeyAuth"), OpenApiSecurity(name = "ApiKeyQueryAuth")]
@@ -34,7 +34,7 @@ class ToolsHandler(private val api: MontoyaApi, private val gate: OperationGate)
     }
 
     @OpenApi(
-        path = "/tools/comparer", methods = [HttpMethod.POST], summary = "Send bytes to Comparer", tags = ["Tools"],
+        path = "/api/v1/tools/comparer", methods = [HttpMethod.POST], summary = "Send bytes to Comparer", tags = ["Tools"],
         requestBody = OpenApiRequestBody(content = [OpenApiContent(from = ToolSendRequest::class)]),
         responses = [OpenApiResponse(status = "202", content = [OpenApiContent(from = StatusResponse::class)])],
         security = [OpenApiSecurity(name = "ApiKeyAuth"), OpenApiSecurity(name = "ApiKeyQueryAuth")]
@@ -49,7 +49,7 @@ class ToolsHandler(private val api: MontoyaApi, private val gate: OperationGate)
     }
 
     @OpenApi(
-        path = "/tools/organizer", methods = [HttpMethod.POST], summary = "Send an HTTP message to Organizer", tags = ["Tools"],
+        path = "/api/v1/tools/organizer", methods = [HttpMethod.POST], summary = "Send an HTTP message to Organizer", tags = ["Tools"],
         requestBody = OpenApiRequestBody(content = [OpenApiContent(from = ToolSendRequest::class)]),
         responses = [OpenApiResponse(status = "202", content = [OpenApiContent(from = StatusResponse::class)])],
         security = [OpenApiSecurity(name = "ApiKeyAuth"), OpenApiSecurity(name = "ApiKeyQueryAuth")]
@@ -74,7 +74,7 @@ class ToolsHandler(private val api: MontoyaApi, private val gate: OperationGate)
     }
 
     @OpenApi(
-        path = "/tools/organizer", methods = [HttpMethod.GET], summary = "Read Organizer items", tags = ["Tools"],
+        path = "/api/v1/tools/organizer", methods = [HttpMethod.GET], summary = "Read Organizer items", tags = ["Tools"],
         queryParams = [
             OpenApiParam(name = "offset", type = Int::class, description = "Zero-based result offset"),
             OpenApiParam(name = "limit", type = Int::class, description = "Page size from 1 to 500")

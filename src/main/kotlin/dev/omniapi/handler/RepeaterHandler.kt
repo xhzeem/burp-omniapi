@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities
 
 class RepeaterHandler(private val api: MontoyaApi) {
     @OpenApi(
-        path = "/repeater/send",
+        path = "/api/v1/repeater/send",
         methods = [HttpMethod.POST],
         summary = "Send a request to Repeater",
         tags = ["Repeater"],

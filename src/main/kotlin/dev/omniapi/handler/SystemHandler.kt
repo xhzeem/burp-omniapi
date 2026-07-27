@@ -22,9 +22,9 @@ class SystemHandler(private val api: MontoyaApi, private val state: ApiState) {
     }
 
     @OpenApi(
-        path = "/system/info",
+        path = "/api/v1/system/info",
         methods = [HttpMethod.GET],
-        summary = "Read Burp OmniAPI status",
+        summary = "Read Burp OmniBridge status",
         tags = ["System"],
         responses = [OpenApiResponse(status = "200", content = [OpenApiContent(from = SystemInfoDto::class)])],
         security = [OpenApiSecurity(name = "ApiKeyAuth"), OpenApiSecurity(name = "ApiKeyQueryAuth")]
@@ -46,7 +46,7 @@ class SystemHandler(private val api: MontoyaApi, private val state: ApiState) {
     }
 
     @OpenApi(
-        path = "/system/capabilities",
+        path = "/api/v1/system/capabilities",
         methods = [HttpMethod.GET],
         summary = "Discover supported capabilities",
         tags = ["System"],
@@ -69,16 +69,16 @@ class SystemHandler(private val api: MontoyaApi, private val state: ApiState) {
                     CapabilityDto("scanner.forcePassive", false, "Montoya cannot invoke its passive scanner"),
                     CapabilityDto("intruder.configureTemplate", true, "Opens a request template with insertion points"),
                     CapabilityDto("intruder.launchAttack", false, "Montoya cannot configure payload lists or start attacks"),
-                    CapabilityDto("shell.execute", false, "Explicitly excluded from OmniAPI"),
-                    CapabilityDto("burp.shutdown", false, "Explicitly excluded from OmniAPI"),
-                    CapabilityDto("ai.prompt", false, "Explicitly excluded from OmniAPI")
+                    CapabilityDto("shell.execute", false, "Explicitly excluded from OmniBridge"),
+                    CapabilityDto("burp.shutdown", false, "Explicitly excluded from OmniBridge"),
+                    CapabilityDto("ai.prompt", false, "Explicitly excluded from OmniBridge")
                 )
             )
         )
     }
 
     companion object {
-        const val PRODUCT = "Burp OmniAPI"
-        const val VERSION = "1.1.1"
+        const val PRODUCT = "Burp OmniBridge"
+        const val VERSION = "0.2.0"
     }
 }

@@ -14,7 +14,7 @@ class BambdaHandler(private val api: MontoyaApi) {
     private val importLock = ReentrantLock()
 
     @OpenApi(
-        path = "/bambda/import",
+        path = "/api/v1/bambda/import",
         methods = [HttpMethod.POST],
         summary = "Import a Bambda",
         tags = ["Bambda"],

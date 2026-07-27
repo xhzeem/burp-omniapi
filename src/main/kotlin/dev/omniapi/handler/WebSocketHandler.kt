@@ -50,7 +50,7 @@ class WebSocketHandler(private val api: MontoyaApi, private val gate: OperationG
     private val sessions = ConcurrentHashMap<String, Session>()
 
     @OpenApi(
-        path = "/websockets",
+        path = "/api/v1/websockets",
         methods = [HttpMethod.POST],
         summary = "Create an extension WebSocket",
         tags = ["WebSockets"],
@@ -124,7 +124,7 @@ class WebSocketHandler(private val api: MontoyaApi, private val gate: OperationG
     }
 
     @OpenApi(
-        path = "/websockets/{id}/messages",
+        path = "/api/v1/websockets/{id}/messages",
         methods = [HttpMethod.POST],
         summary = "Send a WebSocket message",
         tags = ["WebSockets"],
@@ -147,7 +147,7 @@ class WebSocketHandler(private val api: MontoyaApi, private val gate: OperationG
     }
 
     @OpenApi(
-        path = "/websockets/{id}/events",
+        path = "/api/v1/websockets/{id}/events",
         methods = [HttpMethod.GET],
         summary = "Poll WebSocket events",
         tags = ["WebSockets"],
@@ -172,7 +172,7 @@ class WebSocketHandler(private val api: MontoyaApi, private val gate: OperationG
     }
 
     @OpenApi(
-        path = "/websockets/{id}",
+        path = "/api/v1/websockets/{id}",
         methods = [HttpMethod.DELETE],
         summary = "Close a WebSocket",
         tags = ["WebSockets"],

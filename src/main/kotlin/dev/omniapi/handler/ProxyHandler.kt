@@ -24,7 +24,7 @@ class ProxyHandler(
     private val mutationLock = ReentrantLock()
 
     @OpenApi(
-        path = "/proxy/history",
+        path = "/api/v1/proxy/history",
         methods = [HttpMethod.GET],
         summary = "Read Proxy history",
         tags = ["Proxy"],
@@ -55,7 +55,7 @@ class ProxyHandler(
     }
 
     @OpenApi(
-        path = "/proxy/intercept",
+        path = "/api/v1/proxy/intercept",
         methods = [HttpMethod.POST],
         summary = "Read or update Proxy interception",
         tags = ["Proxy"],

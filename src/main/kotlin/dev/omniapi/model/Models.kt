@@ -165,6 +165,9 @@ data class ToolSendRequest(
 data class OrganizerItemDto(val id: Int, val status: String, val message: HttpMessageDto)
 data class BambdaImportRequest(val source: String = "")
 data class BambdaImportResponse(val status: String, val errors: List<String>)
+data class ConfigurationJsonRequest(val json: String = "")
+data class ConfigurationJsonResponse(val json: String)
+data class ConfigurationUpdateResponse(val status: String)
 
 data class UtilityRequest(
     val operation: String = "",

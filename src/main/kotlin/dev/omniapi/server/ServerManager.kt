@@ -37,12 +37,12 @@ class ServerManager(
                 server.set(created)
                 state.lastError.set(null)
                 transition(ServerStatus.RUNNING)
-                api.logging().logToOutput("OmniAPI listening on http://${state.bindAddress.get()}:${state.port.get()}")
+                api.logging().logToOutput("OmniBridge listening on http://${state.bindAddress.get()}:${state.port.get()}")
             } catch (e: Exception) {
                 server.getAndSet(null)?.close()
                 state.lastError.set(e.message ?: e.javaClass.simpleName)
                 transition(ServerStatus.FAILED)
-                api.logging().logToError("OmniAPI failed to start", e)
+                api.logging().logToError("OmniBridge failed to start", e)
             }
         }
     }
@@ -77,12 +77,12 @@ class ServerManager(
             server.set(created)
             state.lastError.set(null)
             transition(ServerStatus.RUNNING)
-            api.logging().logToOutput("OmniAPI listening on http://${state.bindAddress.get()}:${state.port.get()}")
+            api.logging().logToOutput("OmniBridge listening on http://${state.bindAddress.get()}:${state.port.get()}")
         } catch (e: Exception) {
             server.getAndSet(null)?.close()
             state.lastError.set(e.message ?: e.javaClass.simpleName)
             transition(ServerStatus.FAILED)
-            api.logging().logToError("OmniAPI failed to start", e)
+            api.logging().logToError("OmniBridge failed to start", e)
         }
     }
 
@@ -90,14 +90,14 @@ class ServerManager(
         if (state.serverStatus.get() == ServerStatus.STOPPED) return
         transition(ServerStatus.STOPPING)
         runCatching { server.getAndSet(null)?.close() }
-            .onFailure { api.logging().logToError("OmniAPI failed while stopping", it) }
+            .onFailure { api.logging().logToError("OmniBridge failed while stopping", it) }
         transition(ServerStatus.STOPPED)
     }
 
     private fun transition(status: ServerStatus) {
         state.serverStatus.set(status)
         runCatching { listener.get().invoke(status) }
-            .onFailure { api.logging().logToError("OmniAPI status listener failed", it) }
+            .onFailure { api.logging().logToError("OmniBridge status listener failed", it) }
     }
 
     private fun collaboratorClient(): CollaboratorClient =
@@ -110,7 +110,7 @@ class ServerManager(
             } catch (e: Throwable) {
                 state.lastError.set(e.message ?: e.javaClass.simpleName)
                 transition(ServerStatus.FAILED)
-                api.logging().logToError("OmniAPI lifecycle operation '$operation' failed", e)
+                api.logging().logToError("OmniBridge lifecycle operation '$operation' failed", e)
             }
         }
     }

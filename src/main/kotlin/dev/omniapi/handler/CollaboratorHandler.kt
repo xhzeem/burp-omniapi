@@ -25,7 +25,7 @@ class CollaboratorHandler(
 ) {
 
     @OpenApi(
-        path = "/collaborator/payload",
+        path = "/api/v1/collaborator/payload",
         methods = [HttpMethod.POST],
         summary = "Generate a Collaborator payload",
         tags = ["Collaborator"],
@@ -52,7 +52,7 @@ class CollaboratorHandler(
     }
 
     @OpenApi(
-        path = "/collaborator/interactions",
+        path = "/api/v1/collaborator/interactions",
         methods = [HttpMethod.GET],
         summary = "Poll Collaborator interactions",
         tags = ["Collaborator"],

@@ -29,6 +29,9 @@ class ApiState(initialPort: Int = 31337, initialBindAddress: String = "127.0.0.1
     private val modules = EnumMap<ApiModule, AtomicBoolean>(ApiModule::class.java)
     val port = AtomicInteger(initialPort)
     val bindAddress = AtomicReference(initialBindAddress)
+    val restEnabled = AtomicBoolean(true)
+    val mcpEnabled = AtomicBoolean(true)
+    val configEditingEnabled = AtomicBoolean(false)
     val serverStatus = AtomicReference(ServerStatus.STOPPED)
     val lastError = AtomicReference<String?>(null)
 

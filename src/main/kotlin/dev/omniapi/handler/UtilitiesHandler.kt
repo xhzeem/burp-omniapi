@@ -17,7 +17,7 @@ import io.javalin.openapi.*
 
 class UtilitiesHandler(private val api: MontoyaApi, private val gate: OperationGate) {
     @OpenApi(
-        path = "/utilities/transform",
+        path = "/api/v1/utilities/transform",
         methods = [HttpMethod.POST],
         summary = "Run a safe Montoya utility transform",
         tags = ["Utilities"],

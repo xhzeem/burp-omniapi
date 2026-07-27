@@ -35,9 +35,10 @@ extension type. The Montoya API itself is deliberately excluded from the fat JAR
 provides it at runtime.
 
 Every push to `main` runs the complete test and fat-JAR verification suite. The workflow uploads
-the JAR as a retained Actions artifact and refreshes the
-[continuous prerelease](https://github.com/xhzeem/burp-omniapi/releases/tag/continuous) with
-exactly one release asset: `burp-omniapi.jar`.
+the JAR as a retained Actions artifact and publishes a new immutable
+[versioned release](https://github.com/xhzeem/burp-omniapi/releases/latest). Release tags use
+`v<project-version>-build.<run-number>`, and every release contains exactly one asset:
+`burp-omniapi.jar`.
 
 Open the **OmniAPI** tab to copy the generated `X-API-Key`. A new 256-bit key is created on each
 extension load. Protected endpoints accept the key either in the recommended `X-API-Key` header or

@@ -1,4 +1,4 @@
-name: Build and publish continuous JAR
+name: Build and publish versioned JAR
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: continuous-release
+  group: versioned-release
   cancel-in-progress: true
 
 jobs:
@@ -37,6 +37,17 @@ jobs:
       - name: Test and build the verified Shadow JAR
         run: ./gradlew clean build verifyShadowJar --no-daemon
 
+      - name: Resolve the release version
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_version="$(./gradlew properties --no-daemon -q | awk '$1 == "version:" { print $2; exit }')"
+          test -n "${base_version}"
+          release_version="${base_version}-build.${GITHUB_RUN_NUMBER}"
+          echo "version=${release_version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=v${release_version}" >> "${GITHUB_OUTPUT}"
+
       - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -45,28 +56,27 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish rolling continuous prerelease
+      - name: Publish versioned release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          release_tag="continuous"
+          release_tag="${{ steps.release.outputs.tag }}"
+          release_title="Burp OmniAPI ${{ steps.release.outputs.version }}"
           release_notes="Automated verified build from commit ${GITHUB_SHA} on the main branch."
-
-          git tag --force "${release_tag}" "${GITHUB_SHA}"
-          git push origin "refs/tags/${release_tag}" --force
 
           if gh release view "${release_tag}" >/dev/null 2>&1; then
             gh release edit "${release_tag}" \
-              --title "Continuous build" \
+              --title "${release_title}" \
               --notes "${release_notes}" \
-              --prerelease
+              --latest
           else
             gh release create "${release_tag}" \
-              --title "Continuous build" \
+              --target "${GITHUB_SHA}" \
+              --title "${release_title}" \
               --notes "${release_notes}" \
-              --prerelease
+              --latest
           fi
 
           gh release upload "${release_tag}" \
